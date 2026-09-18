@@ -29,6 +29,10 @@
 #define GPIO_MODE_OUT 1
 #define GPIO_MODE_ALTFN 2
 #define GPIO_MODE_ANALOG 3
+//Interupt modes
+#define GPIO_MODE_IR_FT 4 //Falling edge
+#define GPIO_MODE_IR_RT 5 //RISING EDGE
+#define GPIO_MODE_IR_RFT 6 //Rising and Falling edge detection
 
 //GPIO OUTPUT Types
 #define GPIO_OUT_PUSH_PULL 0
@@ -44,8 +48,6 @@
 #define GPIO_NO_PUPD 0
 #define GPIO_PIN_PU 1
 #define GPIO_PIN_PD 2
-
-
 
 
 /*
@@ -64,7 +66,7 @@ typedef struct {
 	//Pointers to hold the base address of the gpio peripheral
 	GPIO_REG_DEF *pGPIOx; //This holds the base address of the GPIO port to which the pin belongs
 	GPIO_PINCONFIG_t GPIO_PinConfig;
-}GPIO_HNADLE_t;
+}GPIO_HANDLE_t;
 
 
 //GPIO Driver Specific Modes
@@ -75,7 +77,7 @@ typedef struct {
  =========================================================*/
 
 //GPIO Controll API
-void GPIO_INIT (GPIO_HNADLE_t *pGPIOHandle); 		//Initilise The GPIO port
+void GPIO_INIT (GPIO_HANDLE_t *pGPIOHandle); 		//Initilise The GPIO port
 void GPIO_DEINIT (GPIO_REG_DEF *PGPIOx);		//Desable the GPIO Port
 
 //GPIO Clock Controll

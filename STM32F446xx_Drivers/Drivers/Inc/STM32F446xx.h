@@ -1,9 +1,10 @@
-#ifndef INC_STM32F446XX_H_
+#ifndef INC_STM32F446XX_H_ //THis is what a Include Guard is, It helps to not add the same heder file twice
+//If not Defined then Execute if Defined then dont execute anything and move away
 #define INC_STM32F446XX_H_
 
-#include<stdint.h>
+#include<stdint.h> // This gives us the fixed width interger types,
 
-//Genric Macros
+//Generic Macros
 #define ENABLE 				1
 #define DISABLE 			0
 #define SET 				ENABLE
@@ -13,6 +14,7 @@
 
 #define __vo volatile
 
+//Simple Memory Map
 #define FLASH_BASEADDR		 		0x08000000U //This is the Flash Base Address
 #define SRAM1_BASEADDR 		 		0x20000000U  //112KB SRAM 1 Base Address
 #define SRAM2_BASEADDR 		 		0x2001C000U  //16KB SRAM2 Base Address
@@ -76,6 +78,8 @@
 #define USART1_BASEADDR 			0x40011000U
 #define USART6_BASEADDR 			0x40011400U
 
+
+//External Interrupt/Event Controller
 #define EXTI_BASEADDR 				0x40013C00U
 
 #define SYSCFG_BASEADDR 			0x40013800U
@@ -96,7 +100,7 @@ typedef struct {
 	__vo uint32_t BSRR; //GPIO port bit set/reset register
 	__vo uint32_t LCKR;// GPIO port configuration lock register
 	__vo uint32_t AFR[2]; //Array for the AFRL and AFRH
-	//Alternate Function low Reg (0-7) and lternate Function High Reg (8-16)  as 0 means low and 1 means High
+	//Alternate Function low Reg (0-7) and lternate Function High Reg (8-15)  as 0 means low and 1 means High
 }GPIO_REG_DEF;
 
 //Structure for the RCC Registers
@@ -257,5 +261,18 @@ typedef struct {
  */
 
 #define SYSCFG_CLK_DI()   (RCC->APB2ENR &= ~(1<<14))
+
+/*
+ * Macros to Reset the GPIOx Peripherals
+ */
+#define GPIOA_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<0)) ; (RCC -> AHB1RSTR &=~(1<<0));} while (0)
+#define GPIOB_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<1)) ; (RCC -> AHB1RSTR &=~(1<<1));} while (0)
+#define GPIOC_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<2)) ; (RCC -> AHB1RSTR &=~(1<<2));} while (0)
+#define GPIOD_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<3)) ; (RCC -> AHB1RSTR &=~(1<<3));} while (0)
+#define GPIOE_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<4)) ; (RCC -> AHB1RSTR &=~(1<<4));} while (0)
+#define GPIOF_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<5)) ; (RCC -> AHB1RSTR &=~(1<<5));} while (0)
+#define GPIOG_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<6)) ; (RCC -> AHB1RSTR &=~(1<<6));} while (0)
+#define GPIOH_REG_RESET()			do{(RCC -> AHB1RSTR |= (1<<7)) ; (RCC -> AHB1RSTR &=~(1<<7));} while (0)
+
 
 #endif /* INC_STM32F446XX_H_ */
