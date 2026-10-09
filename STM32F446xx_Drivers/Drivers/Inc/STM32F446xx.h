@@ -1,9 +1,28 @@
 #ifndef INC_STM32F446XX_H_ //THis is what a Include Guard is, It helps to not add the same heder file twice
-//If not Defined then Execute if Defined then dont execute anything and move away
+//If not Defined then Execute if Defined then don't execute anything and move away
 #define INC_STM32F446XX_H_
 
-#include<stdint.h> // This gives us the fixed width interger types,
+#include<stdint.h> // This gives us the fixed width integer types,
 
+
+/*
+ * Processor Specific Details
+ */
+//NVIC ISERx Address
+#define NVIC_ISER0 		((__vo uint32_t*)0xE000E100)
+#define NVIC_ISER1		((__vo uint32_t*)0xE000E104)
+#define NVIC_ISER2 		((__vo uint32_t*)0xE000E108)
+
+//NVIC ICERx Addresses
+#define NVIC_ICER0 		((__vo uint32_t*)0XE000E180)
+#define NVIC_ICER1		((__vo uint32_t*)0XE000E184)
+#define NVIC_ICER2 		((__vo uint32_t*)0XE000E188)
+
+//NVIC Priority Base Address
+#define NVIC_IPR_BASE_ADDER 	((__vo uint32_t*)0xE000E400)
+
+
+#define NO_OF_BITS_IMPLEMENTED 			4
 //Generic Macros
 #define ENABLE 				1
 #define DISABLE 			0
@@ -11,6 +30,8 @@
 #define RESET				DISABLE
 #define GPIO_PIN_SET		SET
 #define GPIO_PIN_RESET 		RESET
+#define FLAG_SET  			SET
+#define FLAG_RESET			RESET
 
 #define __vo volatile
 
@@ -71,8 +92,9 @@
  * Define the base Address on the APB2 bus Peripherals
  */
 
-//SPI Base ad
+//SPI Base address
 #define SPI1_BASEADDR 				0x40013000U
+#define SPI4_BASEADDR				0x40013400U
 
 //USART Base Address
 #define USART1_BASEADDR 			0x40011000U
@@ -83,6 +105,15 @@
 #define EXTI_BASEADDR 				0x40013C00U
 
 #define SYSCFG_BASEADDR 			0x40013800U
+
+//IRQ numbers for the EXTI
+#define IRQ_EXTI0		6
+#define IRQ_EXTI1		7
+#define IRQ_EXTI2		8
+#define IRQ_EXTI3		9
+#define IRQ_EXTI4		10
+#define IRQ_EXTI9_5		23
+#define IRQ_EXTI15_10	40
 
 /*
  * We are Creating a Structure for each of the registers of the peripherals,
@@ -141,6 +172,40 @@ typedef struct {
 	__vo uint32_t DCKCFGR2;
 }RCC_REG_DEF;
 
+//Structure for the EXTI Registers
+typedef struct {
+	__vo uint32_t EXTI_IMR; 	//Interrupt Mask Register
+	__vo uint32_t EXTI_EMR; 	//Event mask register
+	__vo uint32_t EXTI_RTSR;	//Rising trigger selection register
+	__vo uint32_t EXTI_FTSR;	//Falling trigger selection register
+	__vo uint32_t EXTI_SWIER;	//Software interrupt event register
+	__vo uint32_t EXTI_PR;		//Pending register
+}EXTI_REG_DEF_t;
+
+/*
+ * Peripheral Register DEFF for the SYSCFG regitsers
+ */
+typedef struct {
+	__vo uint32_t SYSCFG_MEMRMP; 		//SYSCFG memory remap register
+	__vo uint32_t SYSCFG_PMC;			//SYSCFG peripheral mode configuration register
+	__vo uint32_t SYSCFG_EXTICR[4];		//SYSCFG external interrupt configuration register from 1 to 4, At 0 =1, and 3 = 4
+	__vo uint32_t SYSCFG_CMPCR;			//Compensation cell control register
+	__vo uint32_t SYSCFG_CFGR;			//SYSCFG configuration register
+}SYSCFG_REG_DEF_t;
+
+/*
+ * Structure for the SPI Resisters
+ */
+typedef struct {
+	__vo uint32_t SPI_CR1;
+	__vo uint32_t SPI_CR2;
+	__vo uint32_t SPI_SR;
+	__vo uint32_t SPI_DR;
+	__vo uint32_t SPI_CRCPR;
+	__vo uint32_t SPI_RXCRCR;
+	__vo uint32_t SPI_TXCRCR;
+}SPI_REG_DEF_t;
+
 /*
  * Peripheral Definitions, Peripherals Bus address typecasted to the xxxx_REG_DEF
  */
@@ -157,13 +222,23 @@ typedef struct {
 //Peripheral Deff for RCC
 #define RCC ((RCC_REG_DEF*)RCC_BASEADDR)
 
+//Peripheral DEFF for EXTI
+#define EXTI ((EXTI_REG_DEF_t*)EXTI_BASEADDR)
+
+//Peripheral DEFF for SYSCGF
+#define SYSCFG ((SYSCFG_REG_DEF_t*)SYSCFG_BASEADDR)
+
+//Peripheral Definitions for the SPI
+#define SPI1 ((SPI_REG_DEF_t*)SPI1_BASEADDR)
+#define SPI2 ((SPI_REG_DEF_t*)SPI2_BASEADDR)
+#define SPI3 ((SPI_REG_DEF_t*)SPI3_BASEADDR)
+#define SPI4 ((SPI_REG_DEF_t*)SPI4_BASEADDR)
 
 //*****************Enable Clock *****************//
 
 /*
  * Clock Enable Macro For GPIOx
  */
-
 #define GPIOA_CLK_EN() (RCC-> AHB1ENR |= (1<<0))
 #define GPIOB_CLK_EN() (RCC-> AHB1ENR |= (1<<1))
 #define GPIOC_CLK_EN() (RCC-> AHB1ENR |= (1<<2))
@@ -186,6 +261,7 @@ typedef struct {
 #define SPI1_CLK_EN() (RCC-> APB2ENR |= (1<<12)) //SPI 1 is on the APB2
 #define SPI2_CLK_EN() (RCC-> APB1ENR |= (1<<14))
 #define SPI3_CLK_EN() (RCC-> APB1ENR |= (1<<15))
+#define SPI4_CLK_EN() (RCC-> APB2ENR |= (1<<13))
 
 /*
  * Clock Enable For UART Peripheral
@@ -236,6 +312,7 @@ typedef struct {
 #define SPI1_CLK_DI()     (RCC->APB2ENR &= ~(1<<12))
 #define SPI2_CLK_DI()     (RCC->APB1ENR &= ~(1<<14))
 #define SPI3_CLK_DI()     (RCC->APB1ENR &= ~(1<<15))
+#define SPI4_CLK_DI()     (RCC->APB2ENR &= ~(1<<13))
 
 
 /*

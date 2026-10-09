@@ -95,7 +95,8 @@ void GPIO_MOD_OT_PORT (GPIO_REG_DEF *pGPIOx, uint16_t Value); 	//GPIO Write Outp
 void GPIO_TOGGLE_OT(GPIO_REG_DEF *pGPIOx, uint8_t PinNumber);		//Toggling the GPIO Output pin
 
 //GPIO IRQ HANDLING AND CONFIG
-void GPIO_IRQ_CFG (uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EN_OR_DIS);		//Configure the GPIO Interrupt
+void GPIO_IRQ_IT_CFG (uint8_t IRQNumber, uint8_t EN_OR_DIS);		//Configure the GPIO Interrupt
+void GPIO_IRQ_PRY_CFG(uint8_t IRQNumber,uint8_t IRQPriority);
 void GPIO_IRQ_HND(uint8_t PinNumber); 		//Interrupt Handling
 
 

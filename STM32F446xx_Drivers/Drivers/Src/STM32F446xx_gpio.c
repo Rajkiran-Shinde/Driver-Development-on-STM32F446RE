@@ -1,5 +1,38 @@
 #include"STM32F446xx_gpio.h"
 #include "STM32F446xx.h"
+
+//Function to get the Port code for the EXTI
+static inline uint16_t GPIO_PORT_CODE (GPIO_REG_DEF *PGPIOx){
+
+	if (PGPIOx == GPIOA){
+		return 0;
+	}
+	else if (PGPIOx == GPIOB){
+		return 1;
+	}
+	else if (PGPIOx == GPIOC){
+		return 2;
+	}
+	else if (PGPIOx == GPIOD){
+		return 3;
+	}
+	else if (PGPIOx == GPIOE){
+		return 4;
+	}
+	else if (PGPIOx == GPIOF){
+		return 5;
+	}
+	else if (PGPIOx == GPIOG){
+		return 6;
+	}
+	else if (PGPIOx == GPIOH){
+		return 7;
+	}
+
+	return 0;
+
+}
+
 /*
  * Peripheral Clock Setup
  */
@@ -25,6 +58,9 @@ void GPIO_INIT(GPIO_HANDLE_t *pGPIOHandle)
 	//This will hold the mask
 	uint32_t temp=0;
 
+	//Enable the Peripheral ClCK
+	GPIO_CLK_CR(pGPIOHandle -> pGPIOx, ENABLE);
+
 	//We are only configuing for the non interrupt mode, so we are limiting it for just 4 modes
 	//as input, output, alternate, and analog.
 	// Config Mode
@@ -33,15 +69,54 @@ void GPIO_INIT(GPIO_HANDLE_t *pGPIOHandle)
 		//This creates a mask
 		temp = (pGPIOHandle -> GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber));
 
-		pGPIOHandle->pGPIOx->MODER &= ~(0x3 <<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber); //Clearing the bit
+		pGPIOHandle->pGPIOx->MODER &= ~(0x3 <<2* pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber); //Clearing the bit
 
 		//Applies the mask on actual register
 		pGPIOHandle->pGPIOx->MODER |= temp;
 
 	}
+
 	else{
-		//Interupt Mode
+		//Interrupt MODE Falling and Rising Edge
+		if (pGPIOHandle-> GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IR_FT){
+			//CONFIG of the FTSR register
+			EXTI->EXTI_FTSR |= (1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+			//Clear the Currosponding RTSR bit
+			EXTI->EXTI_RTSR &= ~(1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+		}
+
+		else if (pGPIOHandle-> GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IR_RT){
+			//CONFIG of the RTSR register
+			EXTI->EXTI_RTSR |= (1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+			//Clear the Currosponding FTSR bit
+			EXTI->EXTI_FTSR &= ~(1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+		}
+
+		else if (pGPIOHandle-> GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IR_RFT){
+			//CONFIG of the RTSR register
+			EXTI->EXTI_RTSR |= (1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+			//Set the Currosponding FTSR bit
+			EXTI->EXTI_FTSR |= (1<<pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
+		}
+
+		// Config The GPIO Port Selection in SYSCFG_EXTICR
+		uint32_t temp1 = (pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber/4); //Gives the register to choose
+
+		uint32_t temp2 = (pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber%4); //Gives the section to Add the bits
+
+		uint32_t portCode = GPIO_PORT_CODE (pGPIOHandle->pGPIOx);
+
+		//Enable the clock for the SYSCFG
+		SYSCFG_CLK_EN();
+		//Clearing the Register before setting them
+		SYSCFG->SYSCFG_EXTICR[temp1] &= ~(portCode << (temp2 * 4));
+
+		SYSCFG->SYSCFG_EXTICR[temp1] |= (portCode << (temp2 * 4));
+
+		//Enable the EXTI interrupt delivery using Interrupt mask register
+		EXTI->EXTI_IMR |= (1 << pGPIOHandle -> GPIO_PinConfig.GPIO_PinNumber);
 	}
+
 
 	//Config the Speed
 	//Clear the Temp value to use again,
@@ -306,12 +381,54 @@ void GPIO_TOGGLE_OT(GPIO_REG_DEF *pGPIOx, uint8_t PinNumber)
 
 // GPIO IRQ Handling and Configuration
 
-void GPIO_IRQ_CFG(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EN_OR_DIS)
+void GPIO_IRQ_IT_CFG(uint8_t IRQNumber, uint8_t EN_OR_DIS)
 {
+	if (EN_OR_DIS == ENABLE){
+		if (IRQNumber <= 31){
+			//ISER0
+			*NVIC_ISER0 |= (1<<IRQNumber);
+		}
+		else if (IRQNumber >= 32 && IRQNumber <= 63){
+			//ISER1
+			*NVIC_ISER1 |= (1<<IRQNumber%32);
+		}
+		else if (IRQNumber >= 64 && IRQNumber <= 96){
+			//ISER 2
+			*NVIC_ISER2 |= (1<<IRQNumber%64);
+		}
+	}
+	else {
+		if (IRQNumber <= 31){
+				//ICER0
+			*NVIC_ICER0 &= ~(1<<IRQNumber);
+		}
+		else if (IRQNumber >= 32 && IRQNumber <= 63){
+				//ICER1
+			*NVIC_ICER1 &= ~(1<<IRQNumber%32);
+		}
+		else if (IRQNumber >= 64 && IRQNumber <= 96){
+				//ICER 2
+			*NVIC_ICER2 &= ~(1<<IRQNumber%32);
+		}
 
+	}
+
+}
+
+void GPIO_IRQ_PRY_CFG(uint8_t IRQNumber,uint8_t IRQPriority){
+	uint8_t IPRx = IRQNumber/4; //This gives the Register which We have to config among the 0 to 59
+	uint8_t IPRx_Section = IRQNumber%4; //This gives the section of that specific register
+	uint8_t shiftAmount = ((IPRx_Section*8)+(8-NO_OF_BITS_IMPLEMENTED));
+
+	*(NVIC_IPR_BASE_ADDER + IPRx) &= ~(0xF << shiftAmount);
+	*(NVIC_IPR_BASE_ADDER + IPRx) |= (IRQPriority<<shiftAmount);
 }
 
 void GPIO_IRQ_HND(uint8_t PinNumber)
 {
+	if (EXTI->EXTI_PR & (1<< PinNumber)){
 
+		//Clear the pending register, to do that we have to set the 1 value
+		EXTI->EXTI_PR |= (1<<PinNumber);
+	}
 }
