@@ -38,8 +38,8 @@ void SPI_GPIO_INIT(void){
 	GPIO_INIT(&SPIpin);
 
 	//NSS
-	//SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_9;
-	//GPIO_INIT(&SPIpin);
+	SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_9;
+	GPIO_INIT(&SPIpin);
 
 }
 
@@ -54,7 +54,7 @@ void SPI2_INIT(void){
 	SPI2handle.spiConfig.SPI_SCLK_Speed = SPI_CLK_SPD_DIV_2; // SCLK CLK of 8 MHz
 	SPI2handle.spiConfig.SPI_CPOL = SPI_CPOL_LOW;
 	SPI2handle.spiConfig.SPI_CPHA = SPI_CPHA_LOW;
-	SPI2handle.spiConfig.SPI_SSM = SPI_SSM_EN;
+	SPI2handle.spiConfig.SPI_SSM = SPI_SSM_DI;
 
 	SPI_INIT(&SPI2handle);
 
@@ -66,7 +66,9 @@ int main (void){
 
 	SPI_GPIO_INIT(); // Enable the GPIO pin as SPI
 
-	SPI2_INIT(); // INIT the SPI2
+	SPI2_INIT(); // INIT the SPI24
+
+	SPI_SSOE_CONFIG(SPI2, ENABLE);
 
 	SPI_SSI_CONFIG(SPI2, ENABLE);
 	//Enable the SPI2 Peripheral

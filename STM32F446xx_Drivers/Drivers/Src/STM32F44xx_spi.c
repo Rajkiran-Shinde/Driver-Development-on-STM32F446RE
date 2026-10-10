@@ -231,5 +231,14 @@ void SPI_SSI_CONFIG(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI){
 }
 
 
+void SPI_SSOE_CONFIG(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI){
+
+	if (EN_or_DI == ENABLE){
+		pSPIx->SPI_CR2 |= (1<<SPI_CR2_SSOE);
+	}
+	else{
+		pSPIx->SPI_CR2 &= ~(1<<SPI_CR2_SSOE);
+	}
+}
 
 

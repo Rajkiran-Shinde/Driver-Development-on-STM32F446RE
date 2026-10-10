@@ -151,8 +151,10 @@ void SPI_IRQ_HND(SPI_HANDLE_t *pHandle); 		//Interrupt Handling
 
 //API to Enable or Disable the SPI PERIpheral
 void SPI_PERI_Control(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI);
+uint8_t SPI_FlagStatus(SPI_REG_DEF_t *pSPIx, uint32_t FlagName);
 
 void SPI_SSI_CONFIG(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI);
 
+void SPI_SSOE_CONFIG(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI);
 
 #endif /* INC_STM32F44XX_SPI_H_ */
