@@ -7,8 +7,8 @@
 //SPI2 Pins
 /*
  * Alternate Fun Block AF5
- * NSS PB9
- * SCL PB10
+ * NSS PB12
+ * SCK PB13
  * MISO PB14
  * MOSI PB15
  */
@@ -26,7 +26,7 @@ void SPI_GPIO_INIT(void){
 
 	//GPIO PIN num Config
 	//SCLK
-	SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_10;
+	SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_13;
 	GPIO_INIT(&SPIpin);
 
 	//MISO
@@ -38,7 +38,7 @@ void SPI_GPIO_INIT(void){
 	GPIO_INIT(&SPIpin);
 
 	//NSS
-	SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_9;
+	SPIpin.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_INIT(&SPIpin);
 
 }
@@ -54,7 +54,7 @@ void SPI2_INIT(void){
 	SPI2handle.spiConfig.SPI_SCLK_Speed = SPI_CLK_SPD_DIV_2; // SCLK CLK of 8 MHz
 	SPI2handle.spiConfig.SPI_CPOL = SPI_CPOL_LOW;
 	SPI2handle.spiConfig.SPI_CPHA = SPI_CPHA_LOW;
-	SPI2handle.spiConfig.SPI_SSM = SPI_SSM_DI;
+	SPI2handle.spiConfig.SPI_SSM = SPI_SSM_EN;
 
 	SPI_INIT(&SPI2handle);
 
