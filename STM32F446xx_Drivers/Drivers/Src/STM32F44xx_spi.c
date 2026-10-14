@@ -185,7 +185,7 @@ void SPI_SendData(SPI_REG_DEF_t *pSPIx, uint8_t *pTXBuffer, uint32_t Len){
 	while (Len > 0){
 
 		//Wait until TXE is set
-		while ( SPI_FlagStatus(pSPIx , SPI_TXE_FLAG) == FLAG_RESET);
+		while (SPI_FlagStatus(pSPIx , SPI_TXE_FLAG) == FLAG_RESET);
 
 		//Check the DFF bit
 		if (pSPIx->SPI_CR1 & (1<<SPI_CR1_DFF)){
@@ -209,6 +209,54 @@ void SPI_SendData(SPI_REG_DEF_t *pSPIx, uint8_t *pTXBuffer, uint32_t Len){
 	}
 }
 
+/*
+ * SPI Receive Data
+ */
+
+/*************************************************************************
+ * @fn 							-SPI Receive DATA
+ *
+ * @Brief  						-
+ *
+ * @param[in]					-
+ * @param[in]					-
+ * @param[in]					-
+ *
+ * @return 						-NA
+ *
+ * @Note						-NA
+ *
+ *
+ *************************************************************************/
+
+void SPI_ReceiveData(SPI_REG_DEF_t *pSPIx, uint8_t *pRXBuffer, uint32_t Len){
+
+	while (Len > 0){
+
+		//Wait until RXNE is set
+		while (SPI_FlagStatus(pSPIx , SPI_RXNE_FLAG) == FLAG_RESET);
+
+		//Check the DFF bit
+		if (pSPIx->SPI_CR1 & (1<<SPI_CR1_DFF)){
+
+			//16 Bit
+			//Load the Data from DR to the RX buffer
+			*((uint16_t*)pRXBuffer) = pSPIx->SPI_DR;
+			Len--;
+			Len--;
+			//Increamne the RX buffer
+			(uint16_t*)pRXBuffer++;
+		}
+		else {
+			//8 Bit
+			//Load the Data from DR to the Rx buffer
+			*pRXBuffer = pSPIx->SPI_DR;
+			Len--;
+			//Increment the RX Buffer
+			pRXBuffer++;
+		}
+	}
+}
 //API to Enable or Disable the SPI PERIpheral
 void SPI_PERI_Control(SPI_REG_DEF_t *pSPIx, uint8_t EN_or_DI){
 	if (EN_or_DI == ENABLE){

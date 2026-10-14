@@ -206,6 +206,23 @@ typedef struct {
 	__vo uint32_t SPI_TXCRCR;
 }SPI_REG_DEF_t;
 
+
+/*
+ * Structure for the I2C register DEFF
+ */
+typedef struct {
+	__vo uint32_t I2C_CR1;
+	__vo uint32_t I2C_CR2;
+	__vo uint32_t I2C_OAR1;
+	__vo uint32_t I2C_OAR2;
+	__vo uint32_t I2C_DR;
+	__vo uint32_t I2C_SR1;
+	__vo uint32_t I2C_SR2;
+	__vo uint32_t I2C_CCR;
+	__vo uint32_t I2C_TRISE;
+	__vo uint32_t I2C_FLTR;
+}I2C_REG_DEF_t;
+
 /*
  * Peripheral Definitions, Peripherals Bus address typecasted to the xxxx_REG_DEF
  */
@@ -233,6 +250,13 @@ typedef struct {
 #define SPI2 ((SPI_REG_DEF_t*)SPI2_BASEADDR)
 #define SPI3 ((SPI_REG_DEF_t*)SPI3_BASEADDR)
 #define SPI4 ((SPI_REG_DEF_t*)SPI4_BASEADDR)
+
+//Peripheral Definitions for the I2C
+#define I2C1 ((I2C_REG_DEF_t*)I2C1_BASEADDR)
+#define I2C2 ((I2C_REG_DEF_t*)I2C2_BASEADDR)
+#define I2C3 ((I2C_REG_DEF_t*)I2C3_BASEADDR)
+
+
 
 //*****************Enable Clock *****************//
 
