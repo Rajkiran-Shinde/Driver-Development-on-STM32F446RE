@@ -97,4 +97,26 @@ typedef struct {
 
 
 
+
+//I2C INIT DEINIT API
+void I2C_INIT (I2C_HANDLE_t *pI2CHandle); 		//Initilise The I2C port
+void I2C_DEINIT (I2C_REG_DEF_t *pI2Cx);		//Desable the I2C Port
+
+//I2C Clock Controll
+void I2C_PERI_CLK_CR (I2C_REG_DEF_t *pI2Cx, uint8_t EN_OR_DIS);	// I2C Peripheral clock control
+
+
+//IRQ Configuration and ISR handling
+
+void I2C_IRQ_IT_CFG (uint8_t IRQNumber, uint8_t EN_OR_DIS);		//Configure the I2C Interrupt
+void I2C_IRQ_PRY_CFG(uint8_t IRQNumber,uint8_t IRQPriority);
+
+
+//I2C Other Peripheral Control Prototypes
+
+//API to Enable or Disable the I2C PERIpheral
+void I2C_PERI_Control(I2C_REG_DEF_t *pI2Cx, uint8_t EN_or_DI);
+uint8_t I2C_FlagStatus(I2C_REG_DEF_t *pI2Cx, uint32_t FlagName);
+
+
 #endif /* INC_STM32F446XX_I2C_H_ */
