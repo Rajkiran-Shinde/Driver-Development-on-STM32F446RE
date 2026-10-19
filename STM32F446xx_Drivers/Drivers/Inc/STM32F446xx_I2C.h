@@ -50,6 +50,14 @@
 #define I2C_CR2_LAST			12
 
 /*
+ * I2C OWN address Register (OAR)
+ */
+#define I2C_OAR1_ADD0			0
+#define I2C_OAR1_ADD			1
+#define I2C_OAR1_ADD_89			8
+#define I2C_OAR1_ADDMODE		15
+
+/*
  * I2C Status Register I2C_SR1
  */
 
@@ -79,7 +87,12 @@
 #define I2C_SR2_SMBHOST		6
 #define I2C_SR2_DUALF		7
 
-
+/*
+ * I2Cclock control register
+*/
+#define I2C_CCR_CCR			0
+#define I2C_CCR_DUTY		14
+#define I2C_CCR_FS			15
 /*
  * Configuration Structure for I2Cx Peripheral
  */
