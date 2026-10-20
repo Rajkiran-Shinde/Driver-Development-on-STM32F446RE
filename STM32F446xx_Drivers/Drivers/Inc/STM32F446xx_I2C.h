@@ -20,6 +20,24 @@
 #define I2C_FM_DUTY_2			0
 #define I2C_FM_DUTY_16_9 		1
 
+/*
+ * Flag Definations
+ */
+#define I2C_FLAG_SB        (1U << I2C_SR1_SB)
+#define I2C_FLAG_ADDR      (1U << I2C_SR1_ADDR)
+#define I2C_FLAG_BTF       (1U << I2C_SR1_BTF)
+#define I2C_FLAG_TXE       (1U << I2C_SR1_TxE)
+#define I2C_FLAG_RXNE      (1U << I2C_SR1_RxNE)
+#define I2C_FLAG_STOPF     (1U << I2C_SR1_STOPF)
+#define I2C_FLAG_ADD10     (1U << I2C_SR1_ADD10)
+#define I2C_FLAG_BERR      (1U << I2C_SR1_BERR)
+#define I2C_FLAG_ARLO      (1U << I2C_SR1_ARLO)
+#define I2C_FLAG_AF        (1U << I2C_SR1_AF)
+#define I2C_FLAG_OVR       (1U << I2C_SR1_OVR)
+#define I2C_FLAG_PECERR    (1U << I2C_SR1_PECERR)
+#define I2C_FLAG_TIMEOUT   (1U << I2C_SR1_TIMEOUT)
+#define I2C_FLAG_SMBALERT  (1U << I2C_SR1_SMBALERT)
+
 //Bit Position Macros For I2C Peripheral
 /*
  * I2C Control Register  CR1
@@ -48,6 +66,14 @@
 #define I2C_CR2_ITBUFEN			10
 #define I2C_CR2_DMAEN			11
 #define I2C_CR2_LAST			12
+
+/*
+ * I2C OWN address Register (OAR)
+ */
+#define I2C_OAR1_ADD0			0
+#define I2C_OAR1_ADD			1
+#define I2C_OAR1_ADD_89			8
+#define I2C_OAR1_ADDMODE		15
 
 /*
  * I2C Status Register I2C_SR1
@@ -79,7 +105,12 @@
 #define I2C_SR2_SMBHOST		6
 #define I2C_SR2_DUALF		7
 
-
+/*
+ * I2Cclock control register
+*/
+#define I2C_CCR_CCR			0
+#define I2C_CCR_DUTY		14
+#define I2C_CCR_FS			15
 /*
  * Configuration Structure for I2Cx Peripheral
  */
@@ -105,6 +136,9 @@ void I2C_DEINIT (I2C_REG_DEF_t *pI2Cx);		//Desable the I2C Port
 //I2C Clock Controll
 void I2C_PERI_CLK_CR (I2C_REG_DEF_t *pI2Cx, uint8_t EN_OR_DIS);	// I2C Peripheral clock control
 
+
+//I2C send Data API
+void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr);
 
 //IRQ Configuration and ISR handling
 
