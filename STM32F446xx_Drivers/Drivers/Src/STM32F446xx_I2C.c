@@ -42,6 +42,7 @@ void I2C_PERI_CLK_CR (I2C_REG_DEF_t *pI2Cx, uint8_t EN_OR_DIS){
 void I2C_INIT (I2C_HANDLE_t *pI2CHandle){
 
 	uint32_t tempreg = 0;
+	uint8_t trise;
 
 	tempreg |= pI2CHandle->I2C_Config.I2C_ACKControl << I2C_CR1_ACK;
 	pI2CHandle ->pI2Cx->I2C_CR1 |= tempreg;
@@ -85,6 +86,20 @@ void I2C_INIT (I2C_HANDLE_t *pI2CHandle){
 		}
 	}
 	pI2CHandle->pI2Cx->I2C_CCR |= tempreg;
+
+	//Trise Configurations
+
+	if (pI2CHandle->I2C_Config.I2C_SCL_SPEED <= I2C_SCL_SPEED_SM){
+		// Mode is STandard mode
+
+		trise = (RCC_GET_PCLK()/1000000U)+1;
+	}
+	else{
+		//Mode if FS
+		trise = ((RCC_GET_PCLK()*300)/1000000000U)+1;
+	}
+
+	pI2CHandle->pI2Cx->I2C_TRISE |= trise & 0x3F; //Masking bits from 6 to 15,
 }
 
 uint32_t RCC_GET_PCLK(void){
