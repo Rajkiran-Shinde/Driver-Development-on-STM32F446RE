@@ -44,12 +44,17 @@ void I2C_INIT (I2C_HANDLE_t *pI2CHandle){
 	uint32_t tempreg = 0;
 	uint8_t trise;
 
+
+	//Enable the Clock for the I2C
+	I2C_PERI_Control(pI2CHandle->pI2Cx, ENABLE);
+
+	//Enabling or Disabling the ACK
 	tempreg |= pI2CHandle->I2C_Config.I2C_ACKControl << I2C_CR1_ACK;
 	pI2CHandle ->pI2Cx->I2C_CR1 |= tempreg;
 
 	//FREQ field of CR 2
-	tempreg |= 0;
-	tempreg |= (RCC_GET_PCLK()/1000000U);
+	tempreg = 0;
+	tempreg |= (RCC_GET_PCLK()/1000000U); //Dividing it by 1000000 to convert Hz into MHz
 	pI2CHandle->pI2Cx->I2C_CR2 |= (tempreg & 0x3F);
 
 	//Own Address config
@@ -108,7 +113,7 @@ uint32_t RCC_GET_PCLK(void){
 	uint8_t CLCKSRC, HPRESRC, AHB_PRE, PPRE1SRC,APB1_PRE;
 
 	//SYStem Clock as HSI, HSE, PLLP, PLLR
-	CLCKSRC = (RCC->CFGR >> 2)& 0x3;
+	CLCKSRC = (RCC->CFGR >> 2)& 0x3; //we are masking all the other bits rather than first 3
 
 	if (CLCKSRC == 0){
 		SysClck = 16000000;
