@@ -140,6 +140,9 @@ void I2C_PERI_CLK_CR (I2C_REG_DEF_t *pI2Cx, uint8_t EN_OR_DIS);	// I2C Periphera
 //I2C send Data API
 void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr);
 
+//I2C Master Receive data
+void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr);
+
 //IRQ Configuration and ISR handling
 
 void I2C_IRQ_IT_CFG (uint8_t IRQNumber, uint8_t EN_OR_DIS);		//Configure the I2C Interrupt
