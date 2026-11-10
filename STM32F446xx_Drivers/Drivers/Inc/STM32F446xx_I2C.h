@@ -15,6 +15,12 @@
 #define I2C_ACK_DISABLE 		0
 
 /*
+ * I2C Repeted Start
+ */
+#define I2C_REP_START 			SET
+#define I2C_NO_REP_START		RESET
+
+/*
  * I2C FM Duty cycle
  */
 #define I2C_FM_DUTY_2			0
@@ -138,10 +144,10 @@ void I2C_PERI_CLK_CR (I2C_REG_DEF_t *pI2Cx, uint8_t EN_OR_DIS);	// I2C Periphera
 
 
 //I2C send Data API
-void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr);
+void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr, uint8_t REP_START);
 
 //I2C Master Receive data
-void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr);
+void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr, uint8_t REP_START);
 
 //IRQ Configuration and ISR handling
 

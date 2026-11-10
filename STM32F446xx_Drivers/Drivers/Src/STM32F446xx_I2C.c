@@ -169,7 +169,7 @@ void I2C_PERI_Control(I2C_REG_DEF_t *pI2Cx, uint8_t EN_or_DI){
 /*
  * I2C send DATA Register
  */
-void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr){
+void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, uint8_t SlaveAddr, uint8_t REP_START){
 
 	//Generate the Start condition
 	I2C_START_COND(pI2CHandle->pI2Cx);
@@ -203,8 +203,9 @@ void I2C_SEND_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pTXBuffer, uint32_t LEN, u
 	while (! I2C_FlagStatus (pI2CHandle->pI2Cx, I2C_FLAG_BTF));
 
 	//Generate the Stop confition
+	if (REP_START==I2C_NO_REP_START){
 	I2C_STOP_COND(pI2CHandle->pI2Cx);
-
+	}
 
 }
 
@@ -264,7 +265,7 @@ static void I2C_STOP_COND(I2C_REG_DEF_t *pI2Cx){
 }
 
 
-void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN, uint8_t SlaveAddr){
+void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN, uint8_t SlaveAddr, uint8_t REP_START){
 	//Step 1, Generate a Start condition
 	I2C_START_COND(pI2CHandle->pI2Cx);
 
@@ -284,8 +285,6 @@ void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN
 		//Step 1, Disabling the ACK
 		I2C_ACK_CTRL(pI2CHandle->pI2Cx, I2C_ACK_DISABLE);
 
-		//Step 2, Generate Stop Condition,
-		I2C_STOP_COND(pI2CHandle->pI2Cx);
 
 		//Step 3, Clear the ADDR flag.
 		I2C_CLEAR_ADDR_FLAG(pI2CHandle->pI2Cx);
@@ -293,10 +292,16 @@ void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN
 		//Step 4, Wait Until RxNE become 1;
 		while(!I2C_FlagStatus(pI2CHandle->pI2Cx, I2C_FLAG_RXNE));
 
+		//Step 2, Generate Stop Condition,
+		I2C_STOP_COND(pI2CHandle->pI2Cx);
+
 		//Step 5, Read Data Into Buffer,
 		*pRXBuffer = pI2CHandle->pI2Cx->I2C_DR;
 
-		return;
+		//Re Enable the ACk
+		if (pI2CHandle->I2C_Config.I2C_ACKControl == I2C_ACK_ENABLE){
+		I2C_ACK_CTRL(pI2CHandle->pI2Cx, I2C_ACK_ENABLE);
+		}
 
 	}
 
@@ -316,7 +321,9 @@ void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN
 				I2C_ACK_CTRL(pI2CHandle->pI2Cx, I2C_ACK_DISABLE);
 
 				//Generate  A Stop Condition.
+				if (REP_START==I2C_NO_REP_START){
 				I2C_STOP_COND(pI2CHandle->pI2Cx);
+				}
 
 			}
 
@@ -330,7 +337,9 @@ void I2C_RECEIVE_DATA(I2C_HANDLE_t *pI2CHandle, uint8_t *pRXBuffer, uint32_t LEN
 	}
 
 	//Re Enable the ACk
+	if (pI2CHandle->I2C_Config.I2C_ACKControl == I2C_ACK_ENABLE){
 	I2C_ACK_CTRL(pI2CHandle->pI2Cx, I2C_ACK_ENABLE);
+	}
 
 }
 

@@ -11,9 +11,10 @@
 
 I2C_HANDLE_t  I2C1handle;
 
-//DATA to send over i2c
-uint8_t some_data[]= "Hii I am IRON MAN\n";
+//I2C Receive Buffer
+uint8_t rcv_buff[32];
 
+#define MyAddr 0x61
 #define SlaveAddr  0x68
 
 void delay_debounce (void){
@@ -53,15 +54,29 @@ void I2C1_INIT(void){
 
 
 int main (){
+	uint8_t cmdcode;
+
 	I2C1_GPIO_INIT();
 
 	I2C1_INIT();
 
 	I2C_PERI_Control(I2C1, ENABLE);
 
-	I2C_SEND_DATA(&I2C1handle, some_data, strlen((char*)some_data), SlaveAddr);
+	while(1){
 
-	while(1);
+		while(! GPIO_MOD_IN(GPIOA, GPIO_PIN_0));
+
+		delay_debounce();
+
+		cmdcode = 0x51;
+		I2C_SEND_DATA(&I2C1handle, &cmdcode, 1, SlaveAddr, I2C_REP_START);
+
+		I2C_RECEIVE_DATA(&I2C1handle, &LEN, 1, SlaveAddr, I2C_REP_START);
+
+		cmdcode = 0x52;
+		I2C_SEND_DATA(&I2C1handle, &cmdcode, 1, SlaveAddr, I2C_REP_START);
+		I2C_RECEIVE_DATA(&I2C1handle, rcv_buff, &LEN, SlaveAddr, I2C_NO_REP_START);
+	}
 
 
 }
